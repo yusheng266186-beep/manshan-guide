@@ -105,8 +105,8 @@ function dayHtml(day){
 $("#days").innerHTML=DAYS.map(dayHtml).join("");
 
 /* ---------- culture flips ---------- */
-$("#cultureCards").innerHTML=CULTURE.map(c=>
- '<div class="flip rv" tabindex="0" role="button" aria-label="翻转查看'+c.place+'文化线索"><div class="flip-inner"><div class="flip-face flip-front"><span class="ff-hint">点击翻转</span><div class="ff-place">'+c.place+'</div><div class="ff-tag">'+c.tag+'</div><div class="ff-line">'+c.front+'</div><span class="ff-deco">'+c.deco+'</span></div><div class="flip-face flip-back '+c.back.alt+'"><div class="fb-title">'+c.back.title+'</div><ul class="fb-list">'+c.back.items.map(x=>"<li>"+x+"</li>").join("")+'</ul><div style="margin-top:auto;padding-top:14px;font-size:11.5px;letter-spacing:.1em;border-top:1px dashed rgba(243,236,221,.35);opacity:.85">'+c.back.foot+"</div></div></div></div>").join("");
+$("#cultureCards").innerHTML=CULTURE.map((c,i)=>
+ '<div class="flip rv" tabindex="0" role="button" aria-label="翻转查看'+c.place+'文化线索"><div class="flip-inner"><div class="flip-face flip-front"><span class="ff-hint">点击翻转</span><div class="ff-idx">'+String(i+1).padStart(2,"0")+' · CULTURE NOTE</div><div class="ff-place">'+c.place+'</div><div class="ff-tag">'+c.tag+'</div><div class="ff-line">'+c.front+'</div><span class="ff-deco">'+c.deco+'</span></div><div class="flip-face flip-back '+c.back.alt+'"><div class="fb-title">'+c.back.title+'</div><ul class="fb-list">'+c.back.items.map(x=>"<li>"+x+"</li>").join("")+'</ul><div style="margin-top:auto;padding-top:14px;font-size:11.5px;letter-spacing:.1em;border-top:1px dashed rgba(243,236,221,.35);opacity:.85">'+c.back.foot+"</div></div></div></div>").join("");
 
 /* ---------- photo ---------- */
 function segHtml(items,name){
@@ -171,6 +171,26 @@ const packState=store.get("pack");
 $("#packWrap").innerHTML=PACK.map((g,gi)=>
   '<div class="card exp rv'+(gi===0?" open":"")+'" data-exp style="margin-bottom:12px"><button class="exp-head" aria-expanded="'+(gi===0) +'"><span class="ptitle"><b>'+String(gi+1).padStart(2,"0")+'</b>'+g[0]+'</span><span style="font-size:11px;color:var(--ink-3)" data-gcount></span><span class="chev"></span></button><div class="exp-body"><div class="exp-in"><div class="exp-pad fadeit"><div class="chk-prog"><i data-gprog></i></div>'+g[1].map((it,ii)=>chkHtml("g"+gi+"i"+ii,it)).join("")+"</div></div></div></div>").join("");
 Array.from(document.querySelectorAll("#packWrap input")).forEach(inp=>{if(packState[inp.dataset.id])inp.checked=true;});
+
+/* ---------- flip cards: size to real content (front & back) ---------- */
+function sizeFlips(){
+  $$(".flip").forEach(f=>{
+    const inner=f.querySelector(".flip-inner");if(!inner)return;
+    const faces=$$(".flip-face",inner);
+    let max=0;
+    faces.forEach(fa=>{
+      faces.forEach(o=>{if(o!==fa){o.style.position="absolute";o.style.visibility="hidden";}});
+      fa.style.position="relative";
+      const h=fa.getBoundingClientRect().height;
+      if(h>max)max=h;
+    });
+    faces.forEach(o=>{o.style.position="";o.style.visibility="";});
+    f.style.height=Math.ceil(max)+"px";
+  });
+}
+sizeFlips();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sizeFlips);
+addEventListener("load",sizeFlips);
 
 /* ---------- interactions ---------- */
 document.addEventListener("click",e=>{
@@ -265,16 +285,28 @@ const spy=new IntersectionObserver(es=>{
 },{rootMargin:"-38% 0px -55% 0px"});
 spyTargets.forEach(t=>t&&spy.observe(t));
 
-/* progress bar + fab */
+/* progress bar + fab + hero parallax */
 const prog=$("#progress"),fab=$("#fab");
+const heroEl=$(".hero"),heroMedia=$("#heroMedia"),heroBodyEl=$(".hero-body"),snavEl=$("#snav");
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let heroH=heroEl.offsetHeight;
+addEventListener("resize",()=>{heroH=heroEl.offsetHeight;sizeFlips();},{passive:true});
+let rt;addEventListener("orientationchange",()=>{clearTimeout(rt);rt=setTimeout(sizeFlips,260);});
 let tick=false;
 function onScroll(){
   if(tick)return;tick=true;
   requestAnimationFrame(()=>{
     const h=document.documentElement;
+    const sy=h.scrollTop;
     const max=h.scrollHeight-innerHeight;
-    prog.style.width=(max>0?(h.scrollTop/max*100):0)+"%";
-    fab.classList.toggle("show",h.scrollTop>innerHeight*1.2);
+    prog.style.width=(max>0?(sy/max*100):0)+"%";
+    fab.classList.toggle("show",sy>innerHeight*1.2);
+    snavEl.classList.toggle("scrolled",sy>heroH-64);
+    if(!reduceMotion&&sy<heroH){
+      heroMedia.style.transform="translate3d(0,"+Math.min(sy*.24,heroH*.14).toFixed(1)+"px,0)";
+      heroBodyEl.style.opacity=Math.max(0,1-sy/(heroH*.72)).toFixed(3);
+      heroBodyEl.style.transform="translate3d(0,"+(sy*.16).toFixed(1)+"px,0)";
+    }
     tick=false;
   });
 }
