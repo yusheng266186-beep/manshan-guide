@@ -17,7 +17,7 @@
 
 <!-- ================= HERO ================= -->
 <header class="hero" id="top">
-  <div class="hero-media" id="heroMedia"><div class="hero-bg" style="background-image:url('assets/hero.jpg')"></div></div>
+  <div class="hero-media" id="heroMedia"><div class="hero-bg" style="background-image:url('assets/hero-tall.jpg')"></div></div>
   <div class="hero-top">
     <div class="hero-route">CHENGDU <i></i> LIJIANG <i></i> SHANGRI-LA</div>
     <div class="stamp">慢山行</div>
@@ -41,10 +41,38 @@
 
 <!-- ================= NAV ================= -->
 <nav class="snav" id="snav">
-  <div class="snav-in">
-    <a href="#xinfa">心法</a><a href="#zong">总览</a><a href="#hotel">主场</a><a href="#trip">行程</a><a href="#culture">文化</a><a href="#photo">摄影</a><a href="#food">美食</a><a href="#backup">备选</a><a href="#pract">实务</a><a href="#lists">清单</a>
+  <div class="snav-row">
+    <div class="snav-in">
+      <a href="#xinfa">心法</a><a href="#zong">总览</a><a href="#hotel">主场</a><a href="#trip">行程</a><a href="#culture">文化</a><a href="#photo">摄影</a><a href="#food">美食</a><a href="#backup">备选</a><a href="#pract">实务</a><a href="#lists">清单</a>
+    </div>
+    <button class="snav-search" id="searchBtn" aria-label="搜索手册内容">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+      <span>搜索</span>
+    </button>
   </div>
 </nav>
+
+<!-- ================= SEARCH OVERLAY ================= -->
+<div class="search-ov" id="searchOv" role="dialog" aria-modal="true" aria-label="搜索">
+  <div class="so-head">
+    <div class="so-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+      <input id="searchInput" type="search" placeholder="搜索：腊排骨 / 转经筒 / 停损线…" autocomplete="off" autocapitalize="off">
+      <button class="so-clear" id="searchClear" aria-label="清空">×</button>
+    </div>
+    <button class="so-cancel" id="searchClose">取消</button>
+  </div>
+  <div class="so-body" id="searchBody">
+    <div class="so-hint" id="searchHint">
+      <p>输入关键词，点击结果直达对应位置</p>
+      <div class="so-chips">
+        <button>腊排骨</button><button>转经筒</button><button>黑龙潭</button><button>玉湖村</button><button>停损线</button><button>预算</button><button>穿搭</button><button>酥油茶</button>
+      </div>
+    </div>
+    <div class="so-count" id="searchCount"></div>
+    <div class="so-results" id="searchResults"></div>
+  </div>
+</div>
 
 <main>
 <!-- ================= 01 心法 ================= -->

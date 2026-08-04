@@ -329,4 +329,138 @@ $$("[data-bg]").forEach(el=>{
   im.onerror=()=>{el.style.backgroundImage="none";};
   im.src=el.style.backgroundImage.slice(5,-2).replace(/'/g,"");
 });
+
+/* ---------- search ---------- */
+const SECTION_NAMES={xinfa:"心法",zong:"总览",hotel:"主场",decide:"关键决定",trip:"行程",culture:"文化",photo:"摄影",food:"美食",backup:"备选景点",pract:"实务",money:"预算",lists:"清单"};
+function sectionOf(el){
+  const s=el.closest("section.sec");
+  const base=s?(SECTION_NAMES[s.id]||"手册"):"手册";
+  if(s&&s.id==="trip"){const db=el.closest(".day-block");if(db)return base+" · DAY "+db.id.replace("day-","");}
+  return base;
+}
+function titleOf(el){
+  if(el.classList.contains("tl-item"))return((el.querySelector(".tl-time")||{}).textContent||"")+" "+((el.querySelector(".tl-title")||{}).textContent||"");
+  if(el.classList.contains("daycard")){const b=el.querySelector(".dd b");const dd=el.querySelector(".dd");const t=dd?(dd.textContent.replace(b?b.textContent:"","")).trim():"";return(b?b.textContent+" ":"")+t;}
+  if(el.classList.contains("day-head")){const db=el.closest(".day-block");return"DAY "+((db||{}).id||"").replace("day-","")+" "+((el.querySelector("h3")||{}).textContent||"");}
+  if(el.classList.contains("dish")||el.classList.contains("bk"))return(((el.querySelector(".dish-name,.bk-name")||{}).textContent||"")).trim();
+  if(el.classList.contains("flip"))return(((el.querySelector(".ff-place,.pc-scene")||{}).textContent||"")).trim()||"卡片";
+  if(el.classList.contains("fn-item"))return((el.querySelector("h4")||{}).textContent||"").trim();
+  if(el.classList.contains("chk"))return(((el.querySelector(".txt")||{}).textContent||"")).trim();
+  if(el.tagName==="TABLE")return(((el.closest(".card")||{}).querySelector(".spec-title,.ptitle,.mini-h")||{}).textContent||"数据表").trim();
+  if(el.classList.contains("dec")||el.classList.contains("spec"))return(((el.querySelector(".ptitle,.spec-title")||{}).textContent||"")).trim();
+  return(el.textContent||"").trim().slice(0,20);
+}
+const SEARCH_SELS=[".day-head",".tl-item",".daycard",".flip",".dish",".bk",".fn-item",".chk",".dec",".spec",".note",".mantra",".pquote",".decision-note","table.tbl"];
+const searchIndex=[];
+document.querySelectorAll(SEARCH_SELS.join(",")).forEach(el=>{
+  if(el.closest(".search-ov,.snav"))return;
+  const text=(el.innerText||"").replace(/\s+/g," ").trim();
+  if(text.length<3)return;
+  searchIndex.push({el:el,text:text,lower:text.toLowerCase(),title:titleOf(el),where:sectionOf(el)});
+});
+const searchOv=$("#searchOv"),searchInput=$("#searchInput"),searchResults=$("#searchResults"),
+      searchHint=$("#searchHint"),searchCount=$("#searchCount"),searchClear=$("#searchClear");
+let lastResults=[];
+function escapeHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function highlight(s,tokens){
+  let h=escapeHtml(s);
+  tokens.forEach(tk=>{
+    const re=new RegExp(tk.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");
+    h=h.replace(re,m=>"<mark>"+escapeHtml(m)+"</mark>");
+  });
+  return h;
+}
+function doSearch(q){
+  q=q.trim();
+  searchClear.classList.toggle("show",q.length>0);
+  if(!q){searchHint.style.display="";searchCount.classList.remove("show");searchResults.innerHTML="";return;}
+  const tokens=q.toLowerCase().split(/\s+/).filter(Boolean);
+  const scored=[];
+  for(const it of searchIndex){
+    let ok=true,score=0;
+    for(const tk of tokens){
+      const i=it.lower.indexOf(tk);
+      if(i<0){ok=false;break;}
+      score+=((it.title||"").toLowerCase().indexOf(tk)>-1?4:0)+Math.min(it.lower.split(tk).length-1,4);
+    }
+    if(ok)scored.push({it:it,score:score});
+  }
+  scored.sort((a,b)=>b.score-a.score);
+  lastResults=scored.slice(0,30);
+  searchHint.style.display="none";
+  searchCount.textContent=scored.length+" 处匹配"+(scored.length>30?" · 显示前 30":"")+" · 点击直达";
+  searchCount.classList.add("show");
+  if(!lastResults.length){
+    searchResults.innerHTML='<div class="so-empty"><b>没有找到「'+escapeHtml(q)+'」</b>换个关键词试试，比如「腊排骨」「转经筒」「玉湖村」</div>';
+    return;
+  }
+  searchResults.innerHTML=lastResults.map((r,i)=>{
+    const idx=r.it.lower.indexOf(tokens[0]);
+    const from=Math.max(0,idx-16),cut=idx+tokens[0].length+34>r.it.text.length;
+    const snip=(from>0?"…":"")+r.it.text.slice(from,idx+tokens[0].length+40)+(cut?"":"…");
+    return '<button class="sr-item" data-i="'+i+'" style="--d:'+(Math.min(i,8)*0.05)+'s"><span class="sr-where"><i></i>'+escapeHtml(r.it.where)+'</span><span class="sr-title">'+highlight(r.it.title||r.it.text.slice(0,22),tokens)+'</span><span class="sr-snip">'+highlight(snip,tokens)+"</span></button>";
+  }).join("");
+  const items=$$(".sr-item",searchResults);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>items.forEach(b=>b.classList.add("in"))));
+}
+function activatePaneOf(el){
+  const pane=el.closest(".photo-pane,.food-pane,.ab-pane");
+  if(!pane)return;
+  if(pane.classList.contains("ab-pane")){
+    const btn=document.querySelector('.abtab[data-ab="'+pane.dataset.abpane+'"]');if(btn)btn.click();
+  }else if(!pane.classList.contains("on")){
+    const name=pane.dataset.segpane;
+    const panes=$$('[data-segpane="'+name+'"]');
+    const seg=document.querySelector('.seg[data-seg="'+name+'"]');
+    const btn=seg&&seg.querySelectorAll("button")[panes.indexOf(pane)];
+    if(btn)btn.click();
+  }
+}
+function jumpTo(entry){
+  closeSearch();
+  const el=entry.it.el;
+  let p=el;
+  while(p&&p!==document.body){
+    if(p.classList){
+      if(p.classList.contains("exp")&&!p.classList.contains("open")){
+        p.classList.add("open");
+        const h=p.querySelector(".exp-head");if(h)h.setAttribute("aria-expanded","true");
+      }
+      if(p.classList.contains("rv"))p.classList.add("in");
+    }
+    p=p.parentElement;
+  }
+  activatePaneOf(el);
+  sizeFlips();
+  setTimeout(()=>{
+    el.scrollIntoView({behavior:"smooth",block:"start"});
+    setTimeout(()=>{
+      const card=el.classList.contains("card")?el:(el.querySelector(":scope>.card")||el);
+      card.classList.remove("flash");
+      void card.offsetWidth;
+      card.classList.add("flash");
+      card.addEventListener("animationend",()=>card.classList.remove("flash"),{once:true});
+    },420);
+  },90);
+}
+function openSearch(){
+  searchOv.classList.add("open");
+  document.documentElement.style.overflow="hidden";
+  setTimeout(()=>searchInput.focus(),380);
+}
+function closeSearch(){
+  searchOv.classList.remove("open");
+  document.documentElement.style.overflow="";
+  searchInput.blur();
+}
+$("#searchBtn").addEventListener("click",openSearch);
+$("#searchClose").addEventListener("click",closeSearch);
+searchClear.addEventListener("click",()=>{searchInput.value="";doSearch("");searchInput.focus();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&searchOv.classList.contains("open"))closeSearch();});
+let sT;searchInput.addEventListener("input",()=>{clearTimeout(sT);sT=setTimeout(()=>doSearch(searchInput.value),130);});
+searchResults.addEventListener("click",e=>{
+  const b=e.target.closest(".sr-item");
+  if(b&&lastResults[+b.dataset.i])jumpTo(lastResults[+b.dataset.i]);
+});
+$$(".so-chips button").forEach(b=>b.addEventListener("click",()=>{searchInput.value=b.textContent;doSearch(b.textContent);}));
 })();
