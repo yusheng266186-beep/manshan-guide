@@ -252,16 +252,17 @@ ul.marklist li::after{content:"";position:absolute;left:4px;top:.62em;width:3.5p
 .flip-back{background:var(--indigo);color:#EFE8D8;transform:rotateY(180deg)}
 .flip-back.alt{background:var(--cinnabar-d)}
 .flip-back.alt2{background:var(--pine)}
-.ff-idx{font-family:var(--disp);font-size:12px;letter-spacing:.3em;color:var(--ink-3);margin-bottom:14px}
+.ff-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;row-gap:4px;margin-bottom:16px}
+.ff-idx{font-family:var(--disp);font-size:12px;letter-spacing:.22em;color:var(--ink-3)}
 .ff-place{font-family:var(--serif);font-weight:900;font-size:24px;letter-spacing:.08em}
 .ff-tag{font-size:11.5px;letter-spacing:.2em;color:var(--cinnabar);margin-top:6px}
 .ff-line{margin-top:auto;font-family:var(--serif);font-size:14.5px;color:var(--ink-2);line-height:2;border-top:1px dashed var(--line);padding-top:14px}
-.ff-hint{position:absolute;right:18px;top:18px;font-size:10.5px;color:var(--ink-3);letter-spacing:.2em;display:flex;align-items:center;gap:6px}
+.ff-hint{position:static;font-size:10.5px;color:var(--ink-3);letter-spacing:.2em;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .ff-hint::after{content:"↻";font-size:13px;color:var(--cinnabar)}
-.fb-title{font-size:11px;letter-spacing:.3em;opacity:.75;margin-bottom:12px}
+.fb-title{font-size:11px;letter-spacing:.22em;opacity:.75;margin-bottom:12px}
 .fb-list{list-style:none;font-size:13px;display:grid;gap:9px}
-.fb-list li{padding-left:16px;position:relative;line-height:1.7}
-.fb-list li::before{content:"·";position:absolute;left:2px;top:0;font-weight:900;color:var(--gold)}
+.fb-list li{padding-left:18px;position:relative;line-height:1.7;text-align:left}
+.fb-list li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:1.5px;background:var(--gold);transform:rotate(-45deg)}
 .ff-deco{position:absolute;right:-8px;bottom:-16px;font-family:var(--seal);font-size:96px;opacity:.06;line-height:1}
 
 /* ---------- photo guide ---------- */
@@ -277,11 +278,14 @@ ul.marklist li::after{content:"";position:absolute;left:4px;top:.62em;width:3.5p
 .pcard .flip-inner{transition-duration:.65s}
 .pcard .flip-face{padding:15px;border-radius:14px}
 .pcard .flip-front{background:var(--card);box-shadow:inset 0 0 0 1px rgba(246,240,228,.6),0 8px 20px -14px rgba(38,32,26,.28)}
-.pcard .flip-back{background:var(--paper-3);color:var(--ink);justify-content:center}
+.pcard .flip-back{background:var(--indigo);color:#EFE7D6;justify-content:flex-start;box-shadow:inset 0 0 0 1px rgba(239,231,214,.08)}
 .pc-scene{font-family:var(--serif);font-weight:700;font-size:16px;letter-spacing:.05em}
 .pc-kw{margin-top:8px;font-size:11.5px;color:var(--ink-3);letter-spacing:.06em;line-height:1.9}
-.pc-tip{font-size:12.5px;line-height:1.85;color:var(--ink-2)}
-.pc-tip::before{content:"拍法";display:inline-block;font-size:10px;letter-spacing:.24em;color:var(--cinnabar);border:1px solid rgba(168,64,42,.4);border-radius:5px;padding:2px 6px;margin-bottom:8px}
+.pc-note{font-size:10px;letter-spacing:.3em;color:var(--gold);display:flex;align-items:center;margin-bottom:10px}
+.pc-note::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(185,138,62,.7),rgba(239,231,214,.12));margin-left:9px}
+.pc-tip{font-size:12.8px;line-height:1.9;color:#EFE7D6}
+.pc-back-foot{margin-top:auto;padding-top:10px;font-size:10px;letter-spacing:.24em;color:rgba(239,231,214,.5);display:flex;align-items:center;gap:8px}
+.pc-back-foot::before{content:"";width:14px;height:1px;background:rgba(239,231,214,.4)}
 .pc-flip-hint{margin-top:auto;padding-top:10px;font-size:10px;letter-spacing:.24em;color:var(--cinnabar)}
 .photo-pane{display:none}
 .photo-pane.on{display:block;animation:panein .55s var(--e-out)}

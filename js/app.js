@@ -106,7 +106,7 @@ $("#days").innerHTML=DAYS.map(dayHtml).join("");
 
 /* ---------- culture flips ---------- */
 $("#cultureCards").innerHTML=CULTURE.map((c,i)=>
- '<div class="flip rv" tabindex="0" role="button" aria-label="翻转查看'+c.place+'文化线索"><div class="flip-inner"><div class="flip-face flip-front"><span class="ff-hint">点击翻转</span><div class="ff-idx">'+String(i+1).padStart(2,"0")+' · CULTURE NOTE</div><div class="ff-place">'+c.place+'</div><div class="ff-tag">'+c.tag+'</div><div class="ff-line">'+c.front+'</div><span class="ff-deco">'+c.deco+'</span></div><div class="flip-face flip-back '+c.back.alt+'"><div class="fb-title">'+c.back.title+'</div><ul class="fb-list">'+c.back.items.map(x=>"<li>"+x+"</li>").join("")+'</ul><div style="margin-top:auto;padding-top:14px;font-size:11.5px;letter-spacing:.1em;border-top:1px dashed rgba(243,236,221,.35);opacity:.85">'+c.back.foot+"</div></div></div></div>").join("");
+ '<div class="flip rv" tabindex="0" role="button" aria-label="翻转查看'+c.place+'文化线索"><div class="flip-inner"><div class="flip-face flip-front"><div class="ff-top"><span class="ff-idx">'+String(i+1).padStart(2,"0")+' · 文化线索</span><span class="ff-hint">点击翻转</span></div><div class="ff-place">'+c.place+'</div><div class="ff-tag">'+c.tag+'</div><div class="ff-line">'+c.front+'</div><span class="ff-deco">'+c.deco+'</span></div><div class="flip-face flip-back '+c.back.alt+'"><div class="fb-title">'+c.back.title+'</div><ul class="fb-list">'+c.back.items.map(x=>"<li>"+x+"</li>").join("")+'</ul><div style="margin-top:auto;padding-top:14px;font-size:11.5px;letter-spacing:.1em;border-top:1px dashed rgba(243,236,221,.35);opacity:.85">'+c.back.foot+"</div></div></div></div>").join("");
 
 /* ---------- photo ---------- */
 function segHtml(items,name){
@@ -114,7 +114,7 @@ function segHtml(items,name){
 }
 $("#photoMount").innerHTML=segHtml(PHOTO.map(p=>p.place),"photo")+
  PHOTO.map((p,i)=>'<div class="photo-pane'+(i===0?" on":"")+'" data-segpane="photo"><div class="photo-grid">'+
-   p.scenes.map(s=>'<div class="pcard flip" tabindex="0" role="button"><div class="flip-inner"><div class="flip-face flip-front"><div class="pc-scene">'+s[0]+'</div><div class="pc-kw">'+s[1]+'</div><div class="pc-flip-hint">翻面看拍法 ↻</div></div><div class="flip-face flip-back"><div class="pc-tip">'+s[2]+"</div></div></div></div>").join("")+
+   p.scenes.map(s=>'<div class="pcard flip" tabindex="0" role="button"><div class="flip-inner"><div class="flip-face flip-front"><div class="pc-scene">'+s[0]+'</div><div class="pc-kw">'+s[1]+'</div><div class="pc-flip-hint">翻面看拍法 ↻</div></div><div class="flip-face flip-back"><div class="pc-note">拍法</div><div class="pc-tip">'+s[2]+'</div><div class="pc-back-foot">'+s[0]+"</div></div></div></div>").join("")+
  "</div></div>").join("");
 
 /* ---------- food ---------- */
@@ -176,6 +176,7 @@ Array.from(document.querySelectorAll("#packWrap input")).forEach(inp=>{if(packSt
 function sizeFlips(){
   $$(".flip").forEach(f=>{
     const inner=f.querySelector(".flip-inner");if(!inner)return;
+    if(!inner.getClientRects().length)return; /* inside hidden pane: size later */
     const faces=$$(".flip-face",inner);
     let max=0;
     faces.forEach(fa=>{
@@ -185,7 +186,7 @@ function sizeFlips(){
       if(h>max)max=h;
     });
     faces.forEach(o=>{o.style.position="";o.style.visibility="";});
-    f.style.height=Math.ceil(max)+"px";
+    if(max>0)f.style.height=Math.ceil(max)+"px";
   });
 }
 sizeFlips();
@@ -208,6 +209,7 @@ document.addEventListener("click",e=>{
     const wrap=ab.closest(".day-block")||document;
     $$(".abtab",wrap).forEach(b=>b.classList.toggle("on",b===ab));
     $$("[data-abpane]",wrap).forEach(p=>p.classList.toggle("on",p.dataset.abpane===ab.dataset.ab));
+    requestAnimationFrame(sizeFlips);
   }
 });
 document.addEventListener("keydown",e=>{
@@ -232,6 +234,7 @@ function initSegs(scope){
       placeThumb(seg);
       const name=seg.dataset.seg;
       $$('[data-segpane="'+name+'"]').forEach((p,i)=>p.classList.toggle("on",$$("button",seg).indexOf(btn)===i));
+      requestAnimationFrame(sizeFlips);
     });
   });
 }
