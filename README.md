@@ -5,6 +5,27 @@
 > 在线页面：[打开慢山行](https://yusheng266186-beep.github.io/manshan-guide/)  
 > GitHub：[查看源代码](https://github.com/yusheng266186-beep/manshan-guide)
 
+<!-- project-navigation:start -->
+## 项目概览
+
+| 项目 | 说明 |
+| --- | --- |
+| 分类 | 旅行与互动展示 |
+| 平台 | 浏览器 / 离线网页 |
+| 当前定位 | 已归档 · 旅行手册 |
+
+丽江与香格里拉六天五晚双人慢度假的随身手册，支持离线阅读。
+
+[历史页面](https://yusheng266186-beep.github.io/manshan-guide/) · [使用与开发](#使用方式) · [项目总导航](https://github.com/yusheng266186-beep/yusheng266186-beep)
+
+其他版式可查看 [六日慢旅行](https://github.com/yusheng266186-beep/ljxl-trip) 和 [旅行视觉展示](https://github.com/yusheng266186-beep/lijiang-travel)。本库保留原始手册。
+
+**归档说明：** 本库保留历史作品与当时的开发、部署或行程记录。原文中的日期、价格和版本具有历史语境，使用前需核对当前信息。
+
+**阅读导航：** [使用方式](#使用方式) · [目录结构](#目录结构)
+
+<!-- project-navigation:end -->
+
 ## 行程定位
 
 - 出发地：成都；
